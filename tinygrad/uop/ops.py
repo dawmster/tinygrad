@@ -768,15 +768,7 @@ def track_rewrites(name:Callable|bool|None=None):
       if TRACK_MATCH_STATS >= 2 and callable(name):
         name_ret = name(*args, **kwargs, ret=ret)
         tracked_keys[-1] = tracked_keys[-1].replace(fn, name_ret) if isinstance(name_ret, str) else name_ret
-      if getenv("CAPTURE_PROCESS_REPLAY"):
-        # find the unittest frame we're capturing in
-        frm = sys._getframe(1)
-        while (f_back:=frm.f_back) is not None and "unittest" not in f_back.f_code.co_filename: frm = f_back
-        loc = f"{frm.f_code.co_filename.split('/')[-1]}:{frm.f_lineno} {frm.f_code.co_name}"
-        # capture global context vars and all the args passed in
-        with Context(PICKLE_BUFFERS=0):
-          inputs = (func.__name__, args, kwargs, ContextVar._cache)
-          replay_capture[hashlib.sha256(pickle.dumps(inputs)).hexdigest()] = pickle.dumps(inputs+(loc, ret))
+      if getenv("CAPTURE_PROCESS_REPLAY"): pass
       return ret
     return __wrapper
   return _decorator
